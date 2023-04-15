@@ -18,6 +18,7 @@ def getAllusers(request):
 @api_view(['POST'])
 def addUser(request):
   print("****************************************")
+  
 
   print(request.data)
   channel_data = database.child('users') 
