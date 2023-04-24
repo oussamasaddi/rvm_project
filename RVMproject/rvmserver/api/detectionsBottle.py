@@ -27,7 +27,7 @@ def detectBottle(request):
   try:
     image = Image.open(io.BytesIO(decoded_image))
     
-    image.save("ehhe.png")
+    #image.save("ehhe.png")
   except Exception as e:
         return HttpResponseBadRequest("Invalid image: {}".format(str(e)))
 
