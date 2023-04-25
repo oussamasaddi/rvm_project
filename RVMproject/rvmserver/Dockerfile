@@ -10,6 +10,6 @@ RUN pip install dlib==19.9.0
 
 
 # Install the application requirements
-RUN pip install --no-cache-dir -r rvmserver\requirements.txt
+RUN pip install -r requirements.txt
 
 RUN python rvmserver\manage.py runserver
