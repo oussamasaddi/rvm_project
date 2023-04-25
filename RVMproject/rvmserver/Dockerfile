@@ -6,10 +6,10 @@ FROM python:3.9
 RUN apt-get update -y && \
     apt-get install build-essential cmake pkg-config -y
 
-RUN pip install dlib==19.9.0
+RUN pip install dlib==19.24.1
 
 
 # Install the application requirements
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r rvmserver\requirements.txt
 
-RUN python manage.py runserver
+RUN python rvmserver\manage.py runserver
