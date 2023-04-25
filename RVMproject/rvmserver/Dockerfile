@@ -13,9 +13,10 @@ RUN apt-get update && apt-get install -y \
     python3-wheel
 
 # Clone the dlib repository and build it
-RUN git clone https://github.com/davisking/dlib.git && \
-    cd dlib && \
-    python3 setup.py install --yes USE_AVX_INSTRUCTIONS --no DLIB_USE_CUDA
+RUN apt-get update -y && \
+    apt-get install build-essential cmake pkg-config -y
+
+RUN pip install dlib==19.9.0
 
 # Create a new user and group to run the application
 RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
