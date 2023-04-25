@@ -1,41 +1,49 @@
-FROM python:3.9
+# Use an official Python runtime as a parent image
+FROM python:3.9-slim-buster
 
-# Install dependencies
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    cmake \
-    git \
-    libgtk-3-dev \
-    libboost-all-dev \
-    python3-dev \
-    python3-pip \
-    python3-setuptools \
-    python3-wheel
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        cmake \
+        build-essential \
+        libopenblas-dev \
+        liblapack-dev \
+        libjpeg-dev \
+        libpng-dev \
+        libtiff-dev \
+        libavcodec-dev \
+        libavformat-dev \
+        libswscale-dev \
+        libv4l-dev \
+        libxvidcore-dev \
+        libx264-dev \
+        libgtk-3-dev \
+        libatlas-base-dev \
+        gfortran \
+        wget \
+        unzip \
+    && rm -rf /var/lib/apt/lists/*
 
-# Clone the dlib repository and build it
-RUN apt-get update -y && \
-    apt-get install build-essential cmake pkg-config -y
+# Install Python dependencies
+RUN pip install --no-cache-dir numpy
 
-RUN pip install dlib==19.9.0
+# Download and build dlib
+RUN mkdir -p /opt/dlib && \
+    cd /opt/dlib && \
+    wget http://dlib.net/files/dlib-19.22.tar.bz2 && \
+    tar xvf dlib-19.22.tar.bz2 && \
+    cd dlib-19.22 && \
+    python setup.py install --yes USE_AVX_INSTRUCTIONS --no DLIB_USE_CUDA && \
+    cd .. && \
+    rm -rf dlib-19.22*
 
-# Create a new user and group to run the application
-RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
-
-# Set the working directory
+# Set the working directory to /app
 WORKDIR /app
 
-# Copy the requirements file and install the dependencies
-COPY requirements.txt .
-RUN pip install -r requirements.txt
-
-# Copy the application code
+# Copy the current directory contents into the container at /app
 COPY . /app
 
-# Set the ownership of the application files
-RUN chown -R appuser:appgroup /app
+# Install the application requirements
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Switch to the appuser
-USER appuser
-
-# Start the Django application
-CMD python manage.py runserver 0.0.0.0:$PORT
+# Set the entry point of the container to the application
+ENTRYPOINT ["python", "app.py"]
