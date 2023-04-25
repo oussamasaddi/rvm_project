@@ -8,14 +8,8 @@ RUN apt-get update -y && \
 
 RUN pip install dlib==19.9.0
 
-# Set the working directory to /app
-WORKDIR /app
-
-# Copy the current directory contents into the container at /app
-COPY . /app
 
 # Install the application requirements
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Set the entry point of the container to the application
-ENTRYPOINT ["python", "app.py"]
+RUN python manage.py runserver
