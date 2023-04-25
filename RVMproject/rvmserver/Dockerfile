@@ -11,7 +11,9 @@ RUN /usr/local/bin/python -m pip install --upgrade pip
 RUN pip install dlib==19.9.0
 
 
-# Install the application requirements
+COPY requirements.txt /opt/app/requirements.txt
+WORKDIR /opt/app
 RUN pip install -r requirements.txt
+COPY . /opt/app
 
 RUN python rvmserver\manage.py runserver
