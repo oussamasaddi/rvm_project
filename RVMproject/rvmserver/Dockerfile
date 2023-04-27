@@ -17,4 +17,4 @@ WORKDIR /opt/app
 RUN pip install -r requirements.txt
 COPY . /opt/app
 
-RUN gunicorn app.wsgi:application --bind 0.0.0.0:8000
+CMD ["gunicorn"  , "-b", "0.0.0.0:8000", "app:app"]
