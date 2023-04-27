@@ -17,4 +17,4 @@ WORKDIR /opt/app
 RUN pip install -r requirements.txt
 COPY . /opt/app
 
-RUN gunicorn rvmserver.wsgi:application --bind 0.0.0.0:$PORT
+RUN gunicorn /opt/app.wsgi:application --bind 0.0.0.0:$PORT
