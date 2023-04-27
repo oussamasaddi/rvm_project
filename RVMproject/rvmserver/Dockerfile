@@ -12,9 +12,9 @@ RUN /usr/local/bin/python -m pip install --upgrade pip
 RUN pip install dlib==19.9.0
 
 
-COPY requirements.txt /opt/app/requirements.txt
-WORKDIR /opt/app
+COPY requirements.txt /app/requirements.txt
+WORKDIR /app
 RUN pip install -r requirements.txt
-COPY . /opt/app
+COPY . /app
 
-CMD ["gunicorn"  , "-b", "0.0.0.0:8000", "app:app"]
+CMD [ "python3" ,"manage.py", "runserver","0.0.0.0:8000" ]
