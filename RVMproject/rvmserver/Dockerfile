@@ -5,7 +5,7 @@ FROM python:3.9
 
 RUN apt-get update -y && \
     apt-get install build-essential cmake pkg-config -y 
-RUN apt-get install libgl1-mesa-glx
+
 
 RUN /usr/local/bin/python -m pip install --upgrade pip
 
