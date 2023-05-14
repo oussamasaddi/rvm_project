@@ -73,8 +73,8 @@ modelBottleCan = YOLO(odel_bottle_can_path)
 def model_rvm(request):
   rslt = {"Type":"UNKNOWN" , "Result":"DENY"}
   labels_canette = ["CANNETTE","CANNETTE_DEFORME"]
-  labels_bottle = ["BOUCHON","BOUTEILLE ","BOUTEILLE_DEFORMEE","BOUTEILLE_DEFORMEE"]
-  labels_bottle_canete = ["BOUCHON","BOUTEILLE ","BOUTEILLE","CANNETTE","CANNETTE"]
+  labels_bottle = ["BOUCHON","BOUTEILLE","BOUTEILLE_DEFORMEE","BOUTEILLE_DEFORMEE"]
+  labels_bottle_canete = ["BOUCHON","BOUTEILLE","BOUTEILLE","CANNETTE","CANNETTE"]
   response = requests.get("https://pbs.twimg.com/media/Es-ocp-XUAAiAZv.jpg:large")
   image = Image.open(BytesIO(response.content))
  #image = Image.open("/content/datasets/nisi-5/valid/images/02_03_2020_14_33_36-Copie-Copie-Copie_jpeg.rf.5e05ba2f22d5f5b9e7adcf3b0e0f9fa2.jpg")
@@ -82,27 +82,28 @@ def model_rvm(request):
   image = np.asarray(image)
   resultsBC = modelBottleCan.predict(image)
   labelBC = labels_bottle_canete[int(resultsBC[0].boxes.boxes[0][-1])]
-  print("hhhhh" , resultsBC[0].boxes.boxes[0][-2] > 0.5 , labelBC)
-  if((resultsBC[0].boxes.boxes[0][-2] > 0,5) and (labelBC == 'BOUTEILLE') ):
+  print("hhhhh" , resultsBC[0].boxes.boxes[0][-2].item() > 0.5 , labelBC)
+  
+  if((resultsBC[0].boxes.boxes[0][-2].item() > 0,5) and (labelBC == 'BOUTEILLE') ):
     resultsB = modelbottle.predict(image)
     labelB = labels_bottle[int(resultsB[0].boxes.boxes[0][-1])]
-    if((resultsB[0].boxes.boxes[0][-2] > 0,5) and (labelB == 'BOUTEILLE') ):
+    if((resultsB[0].boxes.boxes[0][-2].item() > 0,5) and (labelB == 'BOUTEILLE') ):
       rslt = {"Type":"BOUTEILLE" , "Result":"ACCEPTE"}
 
       return  Response(rslt)
     else : 
       rslt = {"Type":"BOUTEILLE_DEFORME" , "Result":"DENY"}
       return  Response(rslt)
-  elif ((resultsBC[0].boxes.boxes[0][-2] > 0,5) and (labelBC == 'CANNETTE') ):
+  elif ((resultsBC[0].boxes.boxes[0][-2].item() > 0,5) and (labelBC == 'CANNETTE') ):
     resultsC = modelcannet.predict(image)
     labelC = labels_canette[int(resultsC[0].boxes.boxes[0][-1])]
-    if((resultsC[0].boxes.boxes[0][-2] >= 0,5) and ( labelC == 'CANNETTE') ):
+    if((resultsC[0].boxes.boxes[0][-2].item() >= 0,5) and ( labelC == 'CANNETTE') ):
       rslt = {"Type":"CANNETTE" , "Result":"ACCEPTE"}
       return  Response(rslt)
     else : 
       rslt = {"Type":"CANNETTE_DEFORME" , "Result":"DENY"}
       return  Response(rslt)
-  elif((resultsBC[0].boxes.boxes[0][-2] > 0,5) and (labelBC == 'BOUCHON') ):
+  elif((resultsBC[0].boxes.boxes[0][-2].item() > 0,5) and (labelBC == 'BOUCHON') ):
       rslt = {"Type":"BOUCHON" , "Result":"DENY"}
       return  Response(rslt)
 
