@@ -12,6 +12,7 @@ urlpatterns = [
     path('add/',views.addUser) , 
     path('detectbottle/', detectionsBottle.detectBottle),
     path('facedetection/',detectionuser.face_recognition_api ),
-    path('mhiri/',modelsall.predmhiri )
+    path('mhiri/',modelsall.predmhiri ),
+    path('rvmmodel/',modelsall.model_rvm )
 
 ]

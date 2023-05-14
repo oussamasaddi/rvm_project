@@ -4,10 +4,20 @@ import os
 import joblib
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
+import numpy as np
+from PIL import Image
+import requests
+from io import BytesIO
+
+
+
+from ultralytics import YOLO
 
 model_path = os.path.abspath('mhiri.joblib')
 
 modelmhiri = joblib.load(model_path)
+
+
 
 
 
@@ -46,3 +56,68 @@ def predmhiri(request):
   a = modelmhiri.predict(dfd)
   succ = {"success" : a[0]}
   return Response(succ)
+
+
+#model rvm 
+
+model_cannete_path = os.path.abspath('canetmodel.pt')
+modelcannet = YOLO(model_cannete_path)
+
+model_bottle_path = os.path.abspath('modelbottle.pt')
+modelbottle = YOLO(model_bottle_path)
+
+odel_bottle_can_path = os.path.abspath('can_bot.pt')
+modelBottleCan = YOLO(odel_bottle_can_path)
+
+@api_view(['POST'])
+def model_rvm(request):
+  rslt = {"Type":"UNKNOWN" , "Result":"DENY"}
+  labels_canette = ["CANNETTE","CANNETTE_DEFORME"]
+  labels_bottle = ["BOUCHON","BOUTEILLE ","BOUTEILLE_DEFORMEE","BOUTEILLE_DEFORMEE"]
+  labels_bottle_canete = ["BOUCHON","BOUTEILLE ","BOUTEILLE","CANNETTE","CANNETTE"]
+  response = requests.get("https://pbs.twimg.com/media/Es-ocp-XUAAiAZv.jpg:large")
+  image = Image.open(BytesIO(response.content))
+ #image = Image.open("/content/datasets/nisi-5/valid/images/02_03_2020_14_33_36-Copie-Copie-Copie_jpeg.rf.5e05ba2f22d5f5b9e7adcf3b0e0f9fa2.jpg")
+  #image=image.resize((224,224))
+  image = np.asarray(image)
+  resultsBC = modelBottleCan.predict(image)
+  labelBC = labels_bottle_canete[int(resultsBC[0].boxes.boxes[0][-1])]
+  print("hhhhh" , resultsBC[0].boxes.boxes[0][-2] > 0.5 , labelBC)
+  if((resultsBC[0].boxes.boxes[0][-2] > 0,5) and (labelBC == 'BOUTEILLE') ):
+    resultsB = modelbottle.predict(image)
+    labelB = labels_bottle[int(resultsB[0].boxes.boxes[0][-1])]
+    if((resultsB[0].boxes.boxes[0][-2] > 0,5) and (labelB == 'BOUTEILLE') ):
+      rslt = {"Type":"BOUTEILLE" , "Result":"ACCEPTE"}
+
+      return  Response(rslt)
+    else : 
+      rslt = {"Type":"BOUTEILLE_DEFORME" , "Result":"DENY"}
+      return  Response(rslt)
+  elif ((resultsBC[0].boxes.boxes[0][-2] > 0,5) and (labelBC == 'CANNETTE') ):
+    resultsC = modelcannet.predict(image)
+    labelC = labels_canette[int(resultsC[0].boxes.boxes[0][-1])]
+    if((resultsC[0].boxes.boxes[0][-2] >= 0,5) and ( labelC == 'CANNETTE') ):
+      rslt = {"Type":"CANNETTE" , "Result":"ACCEPTE"}
+      return  Response(rslt)
+    else : 
+      rslt = {"Type":"CANNETTE_DEFORME" , "Result":"DENY"}
+      return  Response(rslt)
+  elif((resultsBC[0].boxes.boxes[0][-2] > 0,5) and (labelBC == 'BOUCHON') ):
+      rslt = {"Type":"BOUCHON" , "Result":"DENY"}
+      return  Response(rslt)
+
+  else:
+    return  Response(rslt)
+
+
+
+
+
+
+
+
+
+  
+
+
+
