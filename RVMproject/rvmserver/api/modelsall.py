@@ -75,22 +75,29 @@ def model_rvm(request):
   labels_canette = ["CANNETTE","CANNETTE_DEFORME"]
   labels_bottle = ["BOUCHON","BOUTEILLE","BOUTEILLE_DEFORMEE","BOUTEILLE_DEFORMEE"]
   labels_bottle_canete = ["BOUCHON","BOUTEILLE","BOUTEILLE","CANNETTE","CANNETTE"]
-  response = requests.get("https://pbs.twimg.com/media/Es-ocp-XUAAiAZv.jpg:large")
+  response = requests.get("https://thumbs.dreamstime.com/b/soude-ou-canette-de-bi%C3%A8re-vide-chiffonn%C3%A9e-d-isolement-sur-le-blanc-89777178.jpg")
   image = Image.open(BytesIO(response.content))
- #image = Image.open("/content/datasets/nisi-5/valid/images/02_03_2020_14_33_36-Copie-Copie-Copie_jpeg.rf.5e05ba2f22d5f5b9e7adcf3b0e0f9fa2.jpg")
-  #image=image.resize((224,224))
+  #image = Image.open("C:\\Users\\oussa\\OneDrive\\Desktop\\plas.png")
+  image=image.resize((224,224))
   image = np.asarray(image)
   resultsBC = modelBottleCan.predict(image)
   labelBC = labels_bottle_canete[int(resultsBC[0].boxes.boxes[0][-1])]
-  print("hhhhh" , resultsBC[0].boxes.boxes[0][-2].item() > 0.5 , labelBC)
+  print("hhhhh" , resultsBC[0].boxes.boxes[0], labelBC)
   
   if((resultsBC[0].boxes.boxes[0][-2].item() > 0,5) and (labelBC == 'BOUTEILLE') ):
     resultsB = modelbottle.predict(image)
     labelB = labels_bottle[int(resultsB[0].boxes.boxes[0][-1])]
+    
     if((resultsB[0].boxes.boxes[0][-2].item() > 0,5) and (labelB == 'BOUTEILLE') ):
       rslt = {"Type":"BOUTEILLE" , "Result":"ACCEPTE"}
 
       return  Response(rslt)
+    
+    elif((resultsB[0].boxes.boxes[0][-2].item() > 0,5) and (labelB == 'BOUCHON') ):
+      rslt = {"Type":"BOUCHON" , "Result":"DENY"}
+
+      return  Response(rslt)
+    
     else : 
       rslt = {"Type":"BOUTEILLE_DEFORME" , "Result":"DENY"}
       return  Response(rslt)
